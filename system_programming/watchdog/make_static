@@ -1,0 +1,34 @@
+
+cflags = -ansi -pedantic-errors -DNDEBUG -g -Wextra -Wall
+ds_dir = ../../ds
+sch_names = scheduler sch_task ilrd_uid priority_q dllist sorted_ll
+out_names = watch_dog app
+wd_lib = watch_dog_api
+
+sch_objs = $(addprefix tmp/, $(addsuffix .o, $(sch_names)))
+sch_headers = $(addprefix headers/, $(addsuffix .h, $(sch_names)))
+out_bins = $(addsuffix .out, $(out_names))
+
+all: folders $(sch_headers) lib $(out_bins)
+
+lib: $(sch_objs)
+	$(CC) $(cflags) -D_POSIX_C_SOURCE -Iheaders -c $(wd_lib).c -o $(wd_lib).o -lpthread
+	ar r libwatchdog.a tmp/*.o
+
+%.out:
+	$(CC) $(cflags) -Iheaders $*.c -o $@ $(wd_lib).o libwatchdog.a -lpthread
+
+tmp/%.o:
+	$(CC) $(cflags) -Iheaders -c $(ds_dir)/$*/$*.c -o $@
+
+headers/%.h:
+	ln -sf $(PWD)/$(ds_dir)/$*/$*.h $@
+	ln -sf $(PWD)/$(ds_dir)/utils/useful.h headers/utils.h
+
+.PHONY: clean
+
+clean:
+	rm -rf headers tmp *.o *.out *.a
+
+folders: clean
+	mkdir -p headers tmp

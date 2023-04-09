@@ -1,0 +1,31 @@
+
+# this generates libds.so with all the data structures listed in $(names)
+# compile with -lds
+
+cflags = -ansi -pedantic-errors -Wall -Wextra -g -DNDEBUG -O3
+
+
+names = bitarray circbuff linked_list dllist fsq\
+vector stack queue bst avl_node avl hash heap sorted_ll
+
+modules = $(addprefix temp_files/,$(addsuffix .o, $(names)))
+headers = $(addprefix includes/,$(addsuffix .h, $(names)))
+
+#===============================================================================
+
+all: folder $(headers) $(modules)
+	$(CC) $(cflags) -shared -Iincludes temp_files/*.o -o libds.so
+
+includes/%.h: ./*/%.h
+	ln -sf $(PWD)/$*/$*.h $@
+
+temp_files/%.o: ./*/%.c
+	$(CC) $(cflags) -fPIC -Iincludes -c $< -o $@
+
+.PHONY: folder
+folder:
+	mkdir -p temp_files includes
+
+.PHONY: clean
+clean:
+	rm -rf includes temp_files

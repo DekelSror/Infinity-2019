@@ -1,0 +1,14 @@
+*
+!/**/
+!*.h
+!*.c
+!*.hpp
+!*.cpp
+!*.sh
+!make
+!makefile
+!Makefile
+!*.txt
+!*.md
+!.gitignore
+!make_*
